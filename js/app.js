@@ -137,44 +137,6 @@ function createLimb2()
     return limb;
 }
 
-// function createLegs()
-// {
-//     let limb1 = createLimb1();
-//     let limb2 = createLimb2();
-
-//     limb1.position.set(5,5,0);
-//     limb2.position.set(2.5,5,0);
-
-//     let hinge_constraint = new Physijs.HingeConstraint(
-//         limb1,
-//         limb2,
-//         new THREE.Vector3(5,7,0),
-//         new THREE.Vector3(1,0,0)
-//     );
-
-// 	let dot = new THREE.Mesh(new THREE.SphereGeometry(0.5,32,32),new THREE.MeshLambertMaterial({color:"rgb(0,255,0"}));
-//     dot.position.x = 5;
-//     dot.position.y = 3;
-//     scene.add(dot);
-    
-//     scene.add(limb1);
-//     scene.add(limb2);
-        
-// 	scene.addConstraint(hinge_constraint);
-	
-// 	// hinge_constraint.setLimits(
-// 	// 	-Math.PI/3,
-// 	// 	Math.PI/3,
-// 	// 	0.1,
-// 	// 	0.1
-// 	// );
-
-// 	// hinge_constraint.enableAngularMotor(10,1);
-
-
-//     return limb1;
-// }
-
 function createAnt()
 {
 	// duplicate();
@@ -250,6 +212,61 @@ function createAnt()
 	scene.addConstraint(limb41_constraint);
 
 	limb41_constraint.setLimits(-degree,degree,bias,relaxation);
+
+	// Limb 12
+
+	let limb12 = createLimb2();
+	limb12.position.set(-7,bodyHeight,0);
+	
+	scene.add(limb12);
+
+	let limb12_constraint = new Physijs.HingeConstraint(limb11,limb12,new THREE.Vector3(-5,bodyHeight,0),new THREE.Vector3(0,0,1));
+
+	scene.addConstraint(limb12_constraint);
+
+	limb12_constraint.setLimits(-degree,degree,bias,relaxation);
+
+	// Limb 22
+
+	let limb22 = createLimb2();
+	limb22.position.set(7,bodyHeight,0);
+
+	scene.add(limb22);
+
+	let limb22_constraint = new Physijs.HingeConstraint(limb21,limb22,new THREE.Vector3(5,bodyHeight,0),new THREE.Vector3(0,0,1));
+
+	scene.addConstraint(limb22_constraint);
+
+	limb22_constraint.setLimits(-degree,degree,bias,relaxation);
+
+	// Limb 32
+
+	let limb32 = createLimb2();
+	limb32.position.set(0,bodyHeight,-7)
+	limb32.rotation.y = Math.PI/2;
+
+	scene.add(limb32);
+
+	let limb32_constraint = new Physijs.HingeConstraint(limb31,limb32,new THREE.Vector3(0,bodyHeight,-5),new THREE.Vector3(1,0,0));
+
+	scene.addConstraint(limb32_constraint);
+
+	limb32_constraint.setLimits(-degree,degree,bias,relaxation);
+
+	// Limb 42
+
+	let limb42 = createLimb2();
+	limb42.position.set(0,bodyHeight,7)
+	limb42.rotation.y = Math.PI/2;
+
+	scene.add(limb42);
+
+	let limb42_constraint = new Physijs.HingeConstraint(limb41,limb42,new THREE.Vector3(0,bodyHeight,5),new THREE.Vector3(1,0,0));
+
+	scene.addConstraint(limb42_constraint);
+
+	limb42_constraint.setLimits(-degree,degree,bias,relaxation);
+
 }
 
 function createModels()
