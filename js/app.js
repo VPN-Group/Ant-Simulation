@@ -4,6 +4,9 @@ let controls;
 let renderer;
 let scene;
 let clock;
+let constraint=[];
+let AntBody=[];
+let target;
 
 Physijs.scripts.worker = 'lib/physijs_worker.js'
 
@@ -12,7 +15,7 @@ function init()
     container = document.getElementById("scene");
     
     scene = new Physijs.Scene();
-    scene.setGravity(new THREE.Vector3(0,-10,0))
+    scene.setGravity(new THREE.Vector3(0,-20,0))
 
     scene.background = new THREE.Color('rgb(30,30,30)');
 
@@ -34,8 +37,8 @@ function init()
 
 function createCamera() 
 {
-    camera = new THREE.PerspectiveCamera(35,container.clientWidth/container.clientHeight,1,100);
-    camera.position.set(-30,30,30);
+    camera = new THREE.PerspectiveCamera(35,container.clientWidth/container.clientHeight,1,200);
+    camera.position.set(-50,50,50);
     camera.lookAt(scene.position)
 }
 
@@ -54,6 +57,25 @@ function createLights()
     mainLight.position.set(50,50,50);
 
     scene.add(ambientLight,mainLight);
+}
+
+function createDestination()
+{
+	let geometry = new THREE.SphereGeometry(3,32,32);
+	let material = new THREE.MeshLambertMaterial({
+		color:"rgb(0,0,255)"
+	})
+	let circle = new THREE.Mesh(geometry,material);
+
+	let posx = -50+Math.random()*100;
+	posx = (posx>=-25&&posx<=25)?posx*(2+Math.random()):posx;
+	let posz = -50+Math.random()*100;
+	posz = (posz>=-25&&posz<=25)?posz*(2+Math.random()):posz;
+
+	circle.position.set(posx,-2,posz);
+
+	scene.add(circle);
+	target = circle;
 }
 
 function createLimb1()
@@ -158,6 +180,8 @@ function createAnt()
 
     scene.add(sphere);
 
+	AntBody.push(sphere);
+
 	// Limb 11
 	
 	let limb11 = createLimb1();
@@ -171,6 +195,9 @@ function createAnt()
 
 	limb11_constraint.setLimits(-degree,degree,bias,relaxation);
 
+	AntBody.push(limb11);
+	constraint.push(limb11_constraint);
+
 	// Limb 21
 
 	let limb21 = createLimb1();
@@ -183,6 +210,9 @@ function createAnt()
 	scene.addConstraint(limb21_constraint);
 
 	limb21_constraint.setLimits(-degree,degree,bias,relaxation);
+
+	AntBody.push(limb21);
+	constraint.push(limb21_constraint);
 
 	// Limb 31
 
@@ -198,6 +228,9 @@ function createAnt()
 
 	limb31_constraint.setLimits(-degree,degree,bias,relaxation);
 
+	AntBody.push(limb31);
+	constraint.push(limb31_constraint);
+
 	// Limb 41
 
 	let limb41 = createLimb1();
@@ -212,6 +245,9 @@ function createAnt()
 
 	limb41_constraint.setLimits(-degree,degree,bias,relaxation);
 
+	AntBody.push(limb41);
+	constraint.push(limb41_constraint);
+
 	// Limb 12
 
 	let limb12 = createLimb2();
@@ -225,6 +261,9 @@ function createAnt()
 
 	limb12_constraint.setLimits(-degree,degree,bias,relaxation);
 
+	AntBody.push(limb12);
+	constraint.push(limb12_constraint);
+
 	// Limb 22
 
 	let limb22 = createLimb2();
@@ -237,6 +276,9 @@ function createAnt()
 	scene.addConstraint(limb22_constraint);
 
 	limb22_constraint.setLimits(-degree,degree,bias,relaxation);
+
+	AntBody.push(limb22);
+	constraint.push(limb22_constraint);
 
 	// Limb 32
 
@@ -252,6 +294,9 @@ function createAnt()
 
 	limb32_constraint.setLimits(-degree,degree,bias,relaxation);
 
+	AntBody.push(limb32);
+	constraint.push(limb32_constraint);
+
 	// Limb 42
 
 	let limb42 = createLimb2();
@@ -266,11 +311,13 @@ function createAnt()
 
 	limb42_constraint.setLimits(-degree,degree,bias,relaxation);
 
+	AntBody.push(limb42);
+	constraint.push(limb42_constraint);
 }
 
 function createTerrain()
 {
-	let planeGeometry = new THREE.PlaneGeometry(80,80,120,120);
+	let planeGeometry = new THREE.PlaneGeometry(150,150,120,120);
     let planeMaterial = new Physijs.createMaterial(
         new THREE.MeshBasicMaterial({
             map:new THREE.TextureLoader().load('textures/chess.jpg')
@@ -279,7 +326,7 @@ function createTerrain()
         0.2
     );
     planeMaterial.map.wrapS = planeMaterial.map.wrapT = THREE.RepeatWrapping;
-    planeMaterial.map.repeat.set( 1, 1 );
+    planeMaterial.map.repeat.set( 1.25, 1.25 );
     let plane = new Physijs.PlaneMesh(planeGeometry,planeMaterial,0,{
         restitution: 0.2, friction: 0.8
     });
@@ -290,10 +337,18 @@ function createTerrain()
     scene.add(plane);
 }
 
+function createHelper() 
+{
+	let axesHelper = new THREE.AxesHelper(90);
+	scene.add(axesHelper);
+}
+
 function createModels()
 {
+	createHelper();
     createTerrain();
-    createAnt();
+	createAnt();
+	createDestination();
 }
 
 function loadModels() 
