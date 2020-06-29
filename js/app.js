@@ -7,6 +7,8 @@ let clock;
 let constraint=[];
 let AntBody=[];
 let target;
+let actions= new Array(8);
+let callTrain = true;
 
 Physijs.scripts.worker = 'lib/physijs_worker.js'
 
@@ -37,8 +39,8 @@ function init()
 
 function createCamera() 
 {
-    camera = new THREE.PerspectiveCamera(35,container.clientWidth/container.clientHeight,1,200);
-    camera.position.set(-50,50,50);
+    camera = new THREE.PerspectiveCamera(35,container.clientWidth/container.clientHeight,1,250);
+    camera.position.set(-70,70,70);
     camera.lookAt(scene.position)
 }
 
@@ -61,18 +63,18 @@ function createLights()
 
 function createDestination()
 {
-	let geometry = new THREE.SphereGeometry(3,32,32);
+	let geometry = new THREE.SphereGeometry(1,32,32);
 	let material = new THREE.MeshLambertMaterial({
 		color:"rgb(0,0,255)"
 	})
 	let circle = new THREE.Mesh(geometry,material);
 
-	let posx = -50+Math.random()*100;
+	let posx = 25*(1+Math.random())*((Math.random()>0.5)?1:-1);
 	posx = (posx>=-25&&posx<=25)?posx*(2+Math.random()):posx;
-	let posz = -50+Math.random()*100;
+	let posz = 25*(1+Math.random())*((Math.random()>0.5)?1:-1);
 	posz = (posz>=-25&&posz<=25)?posz*(2+Math.random()):posz;
 
-	circle.position.set(posx,-2,posz);
+	circle.position.set(posx,-0.5,posz);
 
 	scene.add(circle);
 	target = circle;
@@ -376,8 +378,8 @@ function createRenderer()
 
 function update()
 {
-    let delta = clock.getDelta();
-
+	let delta = clock.getDelta();
+	
     controls.update(delta);
 }
 
@@ -391,6 +393,11 @@ function onWindowResize()
     camera.aspect = container.clientWidth / container.clientHeight;
     camera.updateProjectionMatrix();
     renderer.setSize(container.clientWidth, container.clientHeight);
+}
+
+function getPosition(body)
+{
+	return body.position;
 }
 
 window.addEventListener('resize',onWindowResize);
