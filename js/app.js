@@ -7,8 +7,8 @@ let clock;
 let constraint=[];
 let AntBody=[];
 let target;
-let actions= new Array(8);
 let callTrain = true;
+let round = 1;
 
 Physijs.scripts.worker = 'lib/physijs_worker.js'
 
@@ -80,7 +80,7 @@ function createDestination()
 	target = circle;
 }
 
-function createLimb1()
+function createLimb1Capsule()
 {
 	let merged = new THREE.Geometry();
 	let cyl = new THREE.CylinderGeometry(0.5,0.5,2,32);
@@ -120,7 +120,7 @@ function createLimb1()
 	return limb;
 }
 
-function createLimb2()
+function createLimb2Capsule()
 {
 	let merged = new THREE.Geometry();
 	let cyl = new THREE.CylinderGeometry(0.5,0.5,3,32);
@@ -145,8 +145,8 @@ function createLimb2()
 		}),
         0.9,
         0.2
-    );
-
+	);
+	
 	let limb = new Physijs.CapsuleMesh(merged,legMaterial,1,{
         restitution: 0.2, friction: 0.7
     });
@@ -165,8 +165,184 @@ function createAnt()
 {
 	let bodyHeight = 10;
 	let bias = 0.5, relaxation = 0.0;
-	let degree = (Math.Pi/180)*60;
-    let sphereGeometry = new THREE.SphereGeometry(2,32,32);
+	let degree = 0.523599*2;
+	let boxGeometry = new THREE.BoxGeometry(4,0.5,4);
+    let boxMaterial = new THREE.MeshLambertMaterial({
+        color:"rgb(255,0,0)",
+    });
+
+    let box = new Physijs.BoxMesh(boxGeometry,boxMaterial,1);
+    box.castShadow = true;
+    box.receiveShadow = true;
+
+	box._physijs.collision_type = 4;
+	box._physijs.collision_masks = 1;
+
+	box.position.set(0,bodyHeight,0);
+
+    scene.add(box);
+
+	AntBody.push(box);
+
+	let legMaterial = new Physijs.createMaterial(
+        new THREE.MeshLambertMaterial({
+			color:"rgb(255,0,0)",
+		}),
+        0.9,
+        0.2
+    );
+
+	// Limb 11
+	
+	let limb11 = new Physijs.BoxMesh(new THREE.BoxGeometry(2,0.5,0.5),legMaterial,1,{
+        restitution: 0.2, friction: 0.7
+    });
+	limb11.position.set(-3,bodyHeight,0);
+
+	scene.add(limb11);
+
+	let limb11_constraint = new Physijs.HingeConstraint(box,limb11,new THREE.Vector3(-2,bodyHeight,0),new THREE.Vector3(0,0,-1));
+
+	scene.addConstraint(limb11_constraint);
+
+	limb11_constraint.setLimits(-degree,degree,bias,relaxation);
+
+	AntBody.push(limb11);
+	constraint.push(limb11_constraint);
+
+	// Limb 21
+
+	let limb21 = new Physijs.BoxMesh(new THREE.BoxGeometry(2,0.5,0.5),legMaterial,1,{
+        restitution: 0.2, friction: 0.7
+    });
+	limb21.position.set(3,bodyHeight,0);
+
+	scene.add(limb21);
+
+	let limb21_constraint = new Physijs.HingeConstraint(box,limb21,new THREE.Vector3(2,bodyHeight,0),new THREE.Vector3(0,0,1));
+
+	scene.addConstraint(limb21_constraint);
+
+	limb21_constraint.setLimits(-degree,degree,bias,relaxation);
+
+	AntBody.push(limb21);
+	constraint.push(limb21_constraint);
+
+	// Limb 31
+
+	let limb31 = new Physijs.BoxMesh(new THREE.BoxGeometry(0.5,0.5,2),legMaterial,1,{
+        restitution: 0.2, friction: 0.7
+    });
+	limb31.position.set(0,bodyHeight,-3);
+
+	scene.add(limb31);
+
+	let limb31_constraint = new Physijs.HingeConstraint(box,limb31,new THREE.Vector3(0,bodyHeight,-2),new THREE.Vector3(-1,0,0));
+
+	scene.addConstraint(limb31_constraint);
+
+	limb31_constraint.setLimits(-degree,degree,bias,relaxation);
+
+	AntBody.push(limb31);
+	constraint.push(limb31_constraint);
+
+	// Limb 41
+
+	let limb41 = new Physijs.BoxMesh(new THREE.BoxGeometry(0.5,0.5,2),legMaterial,1,{
+        restitution: 0.2, friction: 0.7
+    });
+	limb41.position.set(0,bodyHeight,3);
+
+	scene.add(limb41);
+
+	let limb41_constraint = new Physijs.HingeConstraint(box,limb41,new THREE.Vector3(0,bodyHeight,2),new THREE.Vector3(-1,0,0));
+
+	scene.addConstraint(limb41_constraint);
+
+	limb41_constraint.setLimits(-degree,degree,bias,relaxation);
+
+	AntBody.push(limb41);
+	constraint.push(limb41_constraint);
+
+	// Limb 12
+
+	let limb12 = new Physijs.BoxMesh(new THREE.BoxGeometry(3,0.5,0.5),legMaterial,1,{
+        restitution: 0.2, friction: 0.7
+    });
+	limb12.position.set(-5.5,bodyHeight,0);
+	
+	scene.add(limb12);
+
+	let limb12_constraint = new Physijs.HingeConstraint(limb11,limb12,new THREE.Vector3(-4,bodyHeight,0),new THREE.Vector3(0,0,-1));
+
+	scene.addConstraint(limb12_constraint);
+
+	limb12_constraint.setLimits(-degree,degree,bias,relaxation);
+
+	AntBody.push(limb12);
+	constraint.push(limb12_constraint);
+
+	// Limb 22
+
+	let limb22 = new Physijs.BoxMesh(new THREE.BoxGeometry(3,0.5,0.5),legMaterial,1,{
+        restitution: 0.2, friction: 0.7
+    });
+	limb22.position.set(5.5,bodyHeight,0);
+
+	scene.add(limb22);
+
+	let limb22_constraint = new Physijs.HingeConstraint(limb21,limb22,new THREE.Vector3(4,bodyHeight,0),new THREE.Vector3(0,0,1));
+
+	scene.addConstraint(limb22_constraint);
+
+	limb22_constraint.setLimits(-degree,degree,bias,relaxation);
+
+	AntBody.push(limb22);
+	constraint.push(limb22_constraint);
+
+	// Limb 32
+
+	let limb32 = new Physijs.BoxMesh(new THREE.BoxGeometry(0.5,0.5,3),legMaterial,1,{
+        restitution: 0.2, friction: 0.7
+    });
+	limb32.position.set(0,bodyHeight,-5.5)
+
+	scene.add(limb32);
+
+	let limb32_constraint = new Physijs.HingeConstraint(limb31,limb32,new THREE.Vector3(0,bodyHeight,-4),new THREE.Vector3(1,0,0));
+
+	scene.addConstraint(limb32_constraint);
+
+	limb32_constraint.setLimits(-degree,degree,bias,relaxation);
+
+	AntBody.push(limb32);
+	constraint.push(limb32_constraint);
+
+	// Limb 42
+
+	let limb42 = new Physijs.BoxMesh(new THREE.BoxGeometry(0.5,0.5,3),legMaterial,1,{
+        restitution: 0.2, friction: 0.7
+    });
+	limb42.position.set(0,bodyHeight,5.5)
+
+	scene.add(limb42);
+
+	let limb42_constraint = new Physijs.HingeConstraint(limb41,limb42,new THREE.Vector3(0,bodyHeight,4),new THREE.Vector3(-1,0,0));
+
+	scene.addConstraint(limb42_constraint);
+
+	limb42_constraint.setLimits(-degree,degree,bias,relaxation);
+
+	AntBody.push(limb42);
+	constraint.push(limb42_constraint);
+}
+
+function createAntSphere()
+{
+	let bodyHeight = 10;
+	let bias = 0.5, relaxation = 0.0;
+	let degree = 0.523599*2;
+	let sphereGeometry = new THREE.SphereGeometry(2,32,32);
     let sphereMaterial = new THREE.MeshLambertMaterial({
         color:"rgb(255,0,0)",
     });
@@ -186,8 +362,8 @@ function createAnt()
 
 	// Limb 11
 	
-	let limb11 = createLimb1();
-	limb11.position.set(-3.5,bodyHeight,0);
+	let limb11 = createLimb1Capsule();
+	limb11.position.set(-3,bodyHeight,0);
 
 	scene.add(limb11);
 
@@ -202,8 +378,8 @@ function createAnt()
 
 	// Limb 21
 
-	let limb21 = createLimb1();
-	limb21.position.set(3.5,bodyHeight,0);
+	let limb21 =  createLimb1Capsule();
+	limb21.position.set(3,bodyHeight,0);
 
 	scene.add(limb21);
 
@@ -218,8 +394,8 @@ function createAnt()
 
 	// Limb 31
 
-	let limb31 = createLimb1();
-	limb31.position.set(0,bodyHeight,-3.5);
+	let limb31 =  createLimb1Capsule();
+	limb31.position.set(0,bodyHeight,-3);
 	limb31.rotation.y = Math.PI/2;
 
 	scene.add(limb31);
@@ -235,8 +411,8 @@ function createAnt()
 
 	// Limb 41
 
-	let limb41 = createLimb1();
-	limb41.position.set(0,bodyHeight,3.5);
+	let limb41 =  createLimb1Capsule();
+	limb41.position.set(0,bodyHeight,3);
 	limb41.rotation.y = Math.PI/2;
 
 	scene.add(limb41);
@@ -252,12 +428,12 @@ function createAnt()
 
 	// Limb 12
 
-	let limb12 = createLimb2();
-	limb12.position.set(-7,bodyHeight,0);
+	let limb12 =  createLimb2Capsule();
+	limb12.position.set(-5.5,bodyHeight,0);
 	
 	scene.add(limb12);
 
-	let limb12_constraint = new Physijs.HingeConstraint(limb11,limb12,new THREE.Vector3(-5,bodyHeight,0),new THREE.Vector3(0,0,1));
+	let limb12_constraint = new Physijs.HingeConstraint(limb11,limb12,new THREE.Vector3(-4,bodyHeight,0),new THREE.Vector3(0,0,1));
 
 	scene.addConstraint(limb12_constraint);
 
@@ -268,12 +444,12 @@ function createAnt()
 
 	// Limb 22
 
-	let limb22 = createLimb2();
-	limb22.position.set(7,bodyHeight,0);
+	let limb22 =  createLimb2Capsule();
+	limb22.position.set(5.5,bodyHeight,0);
 
 	scene.add(limb22);
 
-	let limb22_constraint = new Physijs.HingeConstraint(limb21,limb22,new THREE.Vector3(5,bodyHeight,0),new THREE.Vector3(0,0,1));
+	let limb22_constraint = new Physijs.HingeConstraint(limb21,limb22,new THREE.Vector3(4,bodyHeight,0),new THREE.Vector3(0,0,1));
 
 	scene.addConstraint(limb22_constraint);
 
@@ -284,13 +460,13 @@ function createAnt()
 
 	// Limb 32
 
-	let limb32 = createLimb2();
-	limb32.position.set(0,bodyHeight,-7)
+	let limb32 =  createLimb2Capsule();
+	limb32.position.set(0,bodyHeight,-5.5)
 	limb32.rotation.y = Math.PI/2;
 
 	scene.add(limb32);
 
-	let limb32_constraint = new Physijs.HingeConstraint(limb31,limb32,new THREE.Vector3(0,bodyHeight,-5),new THREE.Vector3(1,0,0));
+	let limb32_constraint = new Physijs.HingeConstraint(limb31,limb32,new THREE.Vector3(0,bodyHeight,-4),new THREE.Vector3(1,0,0));
 
 	scene.addConstraint(limb32_constraint);
 
@@ -301,13 +477,13 @@ function createAnt()
 
 	// Limb 42
 
-	let limb42 = createLimb2();
-	limb42.position.set(0,bodyHeight,7)
+	let limb42 =  createLimb2Capsule();
+	limb42.position.set(0,bodyHeight,5.5)
 	limb42.rotation.y = Math.PI/2;
 
 	scene.add(limb42);
 
-	let limb42_constraint = new Physijs.HingeConstraint(limb41,limb42,new THREE.Vector3(0,bodyHeight,5),new THREE.Vector3(1,0,0));
+	let limb42_constraint = new Physijs.HingeConstraint(limb41,limb42,new THREE.Vector3(0,bodyHeight,4),new THREE.Vector3(1,0,0));
 
 	scene.addConstraint(limb42_constraint);
 
@@ -376,11 +552,97 @@ function createRenderer()
 
 }
 
+let genomeSize = 8;
+let genomeBound = [0,2];
+let mutStrength = 2.0;
+
+let genome = [];
+let parentFitness = 0;
+
+for(let i=0;i<8;i++)
+{
+    genome[i] = 2*Math.random();
+}
+
+function clamp(num, min, max) 
+{
+    return num <= min ? min : num >= max ? max : num;
+}
+
+function makeKid(parent)
+{
+    let kid = [];
+    for(let i=0;i<parent.length;i++)
+    {
+        kid[i] = parent[i] + mutStrength*Math.random();
+        kid[i] = clamp(kid[i],genomeBound[0],genomeBound[1]);
+    }
+    return kid;
+}
+
+function getReward(bodyPos,DestPos)
+{   
+    if(bodyPos[0] === DestPos[0]&&bodyPos[2] === DestPos[2])
+        return 20;
+
+    let x = bodyPos[0]-DestPos[0];
+    let y = bodyPos[2]-DestPos[2];
+
+    let distance = Math.floor(Math.sqrt(x*x+y*y));
+    let distanceFromOrigin = Math.floor(Math.sqrt(DestPos[0]*DestPos[0]+DestPos[2]*DestPos[2]));
+
+    if(distance > distanceFromOrigin)
+        return 10;
+
+    return 10 + 10*(1/distance);
+}
+
+function step(action)
+{
+	for(let i=0;i<constraint.length;i++)
+	{
+		constraint[i].enableAngularMotor(5*(-1+action[i]),500);
+	}
+}
+
+function getFitness(genome)
+{   
+    // reset();
+    step(genome);
+	
+	let reward = getReward(getPosition(AntBody[0]),getPosition(target));
+    return reward;
+}
+
+function killBad(parent,child)
+{
+    let childFitness = getFitness(child);
+    
+    let pTarget = 1/5;
+    let ps=0;
+
+    if(parentFitness<childFitness)
+    {
+        parent = child;
+        parentFitness = childFitness;
+        ps = 1;
+    } 
+
+    mutStrength *= Math.exp(1/(Math.sqrt(genomeSize+1)))*(ps-pTarget)/(1-pTarget);
+
+    return parent;
+}
+
 function update()
 {
 	let delta = clock.getDelta();
 	
-    controls.update(delta);
+	let child = makeKid(genome);
+    genome = killBad(genome,child);
+
+	console.log(genome);
+	controls.update(delta);
+	round+=1;
 }
 
 function render()
