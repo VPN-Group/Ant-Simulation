@@ -9,7 +9,14 @@ function makeKid(parent)
     for(let i=0;i<parent.length;i++)
     {
         kid[i] = parent[i] + mutStrength*Math.random();
-        kid[i] = clamp(kid[i],genomeBound[0],genomeBound[1]);
+        if(i<8)
+        {
+            kid[i] = clamp(kid[i],genomeBound[0],genomeBound[1]);
+        }
+        else 
+        {
+            kid[i] = clamp(kid[i],0,150);
+        }
     }
     return kid;
 }
@@ -35,7 +42,14 @@ function step(action)
 {
 	for(let i=0;i<constraint.length;i++)
 	{
-		constraint[i].enableAngularMotor(5*(-1+action[i]),500);
+        if((round%action[i+8])<action[i+8]/2)
+        {
+            constraint[i].enableAngularMotor(2*(action[i]),500);
+        }
+        else 
+        {
+            constraint[i].enableAngularMotor(-2*(action[i]),500);
+        }
 	}
 
 	return getReward(getPosition(AntBody[0]),getPosition(target));
@@ -48,8 +62,15 @@ function getFitness(action)
 
 function mutation(genome)
 {
-	let index = Math.floor(Math.random()*9);
-	genome[index] = Math.random()*2;
+	let index = Math.floor(Math.random()*16);
+    if(index<8)
+    {
+        genome[index] = Math.random()*2;
+    }
+    else 
+    {
+        genome[index] = Math.random()*150;
+    }
 
 	return genome;
 }

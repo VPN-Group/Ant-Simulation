@@ -46,9 +46,9 @@ function createCamera()
 
 function createControls() 
 {
-    // controls = new THREE.FirstPersonControls(camera);
-    // controls.lookSpeed = 0.05;
-    // controls.movementSpeed = 10;
+    controls = new THREE.FirstPersonControls(camera);
+    controls.lookSpeed = 0.05;
+    controls.movementSpeed = 10;
 }
 
 function createLights()
@@ -552,16 +552,23 @@ function createRenderer()
 
 }
 
-let genomeSize = 8;
+let genomeSize = 16;
 let genomeBound = [0,2];
 let mutStrength = 2.0;
 
 let genome = [];
 let parentFitness = 0;
 
-for(let i=0;i<8;i++)
+for(let i=0;i<genomeSize;i++)
 {
-    genome[i] = 2*Math.random();
+	if(i<8)
+	{
+		genome[i] = 2*Math.random();
+	}
+	else 
+	{
+        genome[i] = 50+100*Math.random();
+    }
 }
 
 function update()
@@ -575,7 +582,7 @@ function update()
 		mutation(genome);
 	}
 	console.log(genome);
-	// controls.update(delta);
+	controls.update(delta);
 	round+=1;
 }
 
